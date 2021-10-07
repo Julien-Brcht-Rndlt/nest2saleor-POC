@@ -6,9 +6,10 @@ import { CommonController } from './common/common.controller';
 import { ProductsController } from './products/products.controller';
 import { ProductsService } from './products/products.service';
 import { CommonModule } from './common/common.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), CommonModule],
+  imports: [ConfigModule.forRoot(), CommonModule, ProductsModule],
   controllers: [AppController, CommonController, ProductsController],
   providers: [AppService, ProductsService],
 })
