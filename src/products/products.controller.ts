@@ -16,7 +16,8 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
   @Get()
   find(@Query('limit') limit: number) {
-    return this.productsService.getSome(limit as number);
+    const pLimit: number = limit && limit > 0 ? limit : 5;
+    return this.productsService.getSome(pLimit);
   }
 
   @Get(':id')
