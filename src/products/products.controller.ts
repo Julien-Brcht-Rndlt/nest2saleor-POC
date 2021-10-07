@@ -7,11 +7,14 @@ import {
   Post,
   Query,
   Request,
+  UseInterceptors,
 } from '@nestjs/common';
+import { AuthTokenInterceptor } from 'src/common/interceptors/auth-token.interceptor';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
 
+@UseInterceptors(AuthTokenInterceptor)
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
