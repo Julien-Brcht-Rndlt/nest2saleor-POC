@@ -3,10 +3,11 @@ import { Product } from './entities/product.entities';
 import { request } from 'graphql-request';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { URL } from 'url';
 
 @Injectable()
 export class ProductsService {
-  async getOne(productId: string): Promise<Product> {
+  async getOne(productId: string, token: string): Promise<Product> {
     const query = `query GET_PRODUCT_BYID($productId : ID !) {
       product(id: $productId) {
         id
@@ -27,11 +28,13 @@ export class ProductsService {
       productId,
     };
     const requestHeaders = {
-      authorization:
-        'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM1NDA4NDAsImV4cCI6MTYzMzU0MTE0MCwidG9rZW4iOiJzSzdrdEZpcWJHUW8iLCJlbWFpbCI6ImpuLmJyYWNoZXQucmFuZGx0QGdtYWlsLmNvbSIsInR5cGUiOiJhY2Nlc3MiLCJ1c2VyX2lkIjoiVlhObGNqb3lOQT09IiwiaXNfc3RhZmYiOnRydWV9.Oh9GYis7bgcMy8hT0koXWfTx1fKBea4wr9p3fEMahWk',
+      Authorization: token,
     };
+
+    const url = new URL(process.env.SALEOR_API_URL);
+
     const response = await request(
-      'http://localhost:8000/graphql/',
+      url.toString(),
       query,
       variables,
       requestHeaders,
@@ -53,7 +56,7 @@ export class ProductsService {
   /**
    * Get some products based on pagination parameters
    */
-  async getSome(limit: number): Promise<Product[]> {
+  async getSome(limit: number, token: string): Promise<Product[]> {
     const query = `query GET_PRODUCTS($limit: Int !){
       products(first: $limit){
         edges {
@@ -78,13 +81,16 @@ export class ProductsService {
     const variables = {
       limit,
     };
+    console.log('token in service', token);
     const requestHeaders = {
-      authorization:
-        'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM1NDA4NDAsImV4cCI6MTYzMzU0MTE0MCwidG9rZW4iOiJzSzdrdEZpcWJHUW8iLCJlbWFpbCI6ImpuLmJyYWNoZXQucmFuZGx0QGdtYWlsLmNvbSIsInR5cGUiOiJhY2Nlc3MiLCJ1c2VyX2lkIjoiVlhObGNqb3lOQT09IiwiaXNfc3RhZmYiOnRydWV9.Oh9GYis7bgcMy8hT0koXWfTx1fKBea4wr9p3fEMahWk',
+      Authorization: token,
     };
+    console.log('requestHeaders', requestHeaders);
+
+    const url = new URL(process.env.SALEOR_API_URL);
 
     const response = await request(
-      'http://localhost:8000/graphql/',
+      url.toString(),
       query,
       variables,
       requestHeaders,
@@ -102,7 +108,10 @@ export class ProductsService {
   /**
    * Add a product through Saleor API
    */
-  async addOne(createProductDto: CreateProductDto): Promise<Product> {
+  async addOne(
+    createProductDto: CreateProductDto,
+    token: string,
+  ): Promise<Product> {
     const query = `mutation 
         ADD_PRODUCT($productInput: ProductCreateInput !) {
           productCreate(input: $productInput) 
@@ -150,18 +159,18 @@ export class ProductsService {
     };
 
     const requestHeaders = {
-      authorization:
-        'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM1NDA4NDAsImV4cCI6MTYzMzU0MTE0MCwidG9rZW4iOiJzSzdrdEZpcWJHUW8iLCJlbWFpbCI6ImpuLmJyYWNoZXQucmFuZGx0QGdtYWlsLmNvbSIsInR5cGUiOiJhY2Nlc3MiLCJ1c2VyX2lkIjoiVlhObGNqb3lOQT09IiwiaXNfc3RhZmYiOnRydWV9.Oh9GYis7bgcMy8hT0koXWfTx1fKBea4wr9p3fEMahWk',
+      Authorization: token,
     };
 
+    const url = new URL(process.env.SALEOR_API_URL);
+
     const response = await request(
-      'http://localhost:8000/graphql/',
+      url.toString(),
       query,
       variables,
       requestHeaders,
     );
 
-    console.log('response:', response);
     const productDto: Omit<CreateProductDto, 'sku'> & { id: string } =
       response.productCreate.product;
     if (productDto || response.productCreate.productErrors) {
@@ -183,6 +192,7 @@ export class ProductsService {
   async modifyOne(
     productId: string,
     updateProductDto: UpdateProductDto,
+    token: string,
   ): Promise<Product> | null {
     let product: Product | null = null;
     const query = `mutation UPDATE_PARTIALLY_PRODUCT($productId: ID !, $updateValues: ProductInput !) {
@@ -218,16 +228,18 @@ export class ProductsService {
     };
 
     const requestHeaders = {
-      authorization:
-        'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM2MTEwODgsImV4cCI6MTYzMzYxMTM4OCwidG9rZW4iOiJzSzdrdEZpcWJHUW8iLCJlbWFpbCI6ImpuLmJyYWNoZXQucmFuZGx0QGdtYWlsLmNvbSIsInR5cGUiOiJhY2Nlc3MiLCJ1c2VyX2lkIjoiVlhObGNqb3lOQT09IiwiaXNfc3RhZmYiOnRydWV9.eH_Ic8Qy2okjeLgKyODcjhypUGGLVArNEHzYN2vLuXo',
+      authorization: token,
     };
+
+    const url = new URL(process.env.SALEOR_API_URL);
+
     const response = await request(
-      'http://localhost:8000/graphql/',
+      url.toString(),
       query,
       variables,
       requestHeaders,
     );
-    console.log(response);
+
     if (
       response.productUpdate.product &&
       response.productUpdate.productErrors.length === 0
