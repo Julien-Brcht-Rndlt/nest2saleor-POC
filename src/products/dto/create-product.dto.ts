@@ -1,5 +1,4 @@
 export class CreateProductDto {
-  readonly id?: string;
   readonly productType: string;
   readonly name: string;
   readonly slug?: string;
