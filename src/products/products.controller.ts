@@ -11,9 +11,12 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { applyXAccessToken } from 'src/tools/common-funcs';
 import { CreateProductDto } from './dto/create-product.dto';
 import { StockDto } from './dto/stock.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Product } from './entities/product.entity';
+import { Stock } from './entities/stock.entity';
 import { ProductsService } from './products.service';
 import { StocksService } from './stocks.service';
 
@@ -25,15 +28,23 @@ export class ProductsController {
   ) {}
   @Get()
   find(@Query('limit') limit: number, @Request() req: Request) {
-    const token = req.headers['x-access-token'];
     const pLimit: number = limit && limit > 0 ? limit : 5;
-    return this.productsService.getSome(pLimit, token);
+    return applyXAccessToken<Promise<Product[]>>(
+      req,
+      (token: string): Promise<Product[]> => {
+        return this.productsService.getSome(pLimit, token);
+      },
+    );
   }
 
   @Get(':id')
   findOne(@Param('id') productId: string, @Request() req: Request) {
-    const token = req.headers['x-access-token'];
-    return this.productsService.getOne(productId, token);
+    return applyXAccessToken<Promise<Product>>(
+      req,
+      (token: string): Promise<Product> => {
+        return this.productsService.getOne(productId, token);
+      },
+    );
   }
 
   @UsePipes(ValidationPipe)
@@ -42,8 +53,12 @@ export class ProductsController {
     @Body() createProductDto: CreateProductDto,
     @Request() req: Request,
   ) {
-    const token = req.headers['x-access-token'];
-    return await this.productsService.addOne(createProductDto, token);
+    return applyXAccessToken<Promise<Product>>(
+      req,
+      async (token: string): Promise<Product> => {
+        return await this.productsService.addOne(createProductDto, token);
+      },
+    );
   }
 
   /* @UsePipes(ValidationPipe) */
@@ -53,8 +68,12 @@ export class ProductsController {
     @Body() updateProductDto: UpdateProductDto,
     @Request() req: Request,
   ) {
-    const token = req.headers['x-access-token'];
-    return this.productsService.modifyOne(id, updateProductDto, token);
+    return applyXAccessToken<Promise<Product>>(
+      req,
+      async (token: string): Promise<Product> => {
+        return this.productsService.modifyOne(id, updateProductDto, token);
+      },
+    );
   }
 
   /**
@@ -62,8 +81,12 @@ export class ProductsController {
    */
   @Get(':id/stocks')
   readStock(@Param() params: { id: string }, @Request() req: Request) {
-    const token = req.headers['x-access-token'];
-    return this.stocksService.retrieveAmount(params.id, token);
+    return applyXAccessToken<Promise<Stock>>(
+      req,
+      async (token: string): Promise<Stock> => {
+        return this.stocksService.retrieveAmount(params.id, token);
+      },
+    );
   }
 
   /**
@@ -76,8 +99,12 @@ export class ProductsController {
     @Body() stockDto: StockDto,
     @Request() req: Request,
   ) {
-    const token = req.headers['x-access-token'];
-    return this.stocksService.initAmount(productId, stockDto, token);
+    return applyXAccessToken<Promise<Stock>>(
+      req,
+      async (token: string): Promise<Stock> => {
+        return this.stocksService.initAmount(productId, stockDto, token);
+      },
+    );
   }
 
   /**
@@ -90,7 +117,11 @@ export class ProductsController {
     @Body() stockDto: StockDto,
     @Request() req: Request,
   ) {
-    const token = req.headers['x-access-token'];
-    return this.stocksService.modifyAmount(productId, stockDto, token);
+    return applyXAccessToken<Promise<Stock>>(
+      req,
+      async (token: string): Promise<Stock> => {
+        return this.stocksService.modifyAmount(productId, stockDto, token);
+      },
+    );
   }
 }
