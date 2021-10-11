@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { request } from 'graphql-request';
+import { performQuery } from 'src/utils/common-funcs';
 import { StockDto } from '../products/dto/stock.dto';
 import { Stock } from './entities/stock.entity';
 
@@ -45,7 +45,11 @@ export class StocksService {
       productId,
     };
 
-    const response = await this.performQuery(query, variables, token);
+    const response = await performQuery<QueryVariables>(
+      query,
+      variables,
+      token,
+    );
 
     console.log('response', response);
 
@@ -86,7 +90,11 @@ export class StocksService {
       ],
     };
 
-    const response = await this.performQuery(query, variables, token);
+    const response = await performQuery<QueryVariables>(
+      query,
+      variables,
+      token,
+    );
 
     console.log('response', response);
 
@@ -116,7 +124,7 @@ export class StocksService {
       productId,
     };
 
-    const variantsResponse = await this.performQuery(
+    const variantsResponse = await performQuery<QueryVariables>(
       variantsQuery,
       variantsVariables,
       token,
@@ -150,31 +158,17 @@ export class StocksService {
       ],
     };
 
-    const response = await this.performQuery(stockQuery, stockVariables, token);
+    const response = await performQuery<QueryVariables>(
+      stockQuery,
+      stockVariables,
+      token,
+    );
 
     console.log('response', response);
 
     return this.parseAsStock(
       productId,
       response.productVariantStocksCreate.productVariant,
-    );
-  }
-
-  private async performQuery(
-    query: string,
-    variables: QueryVariables,
-    token: string,
-  ): Promise<any> {
-    const requestHeaders = {
-      Authorization: token,
-    };
-    const url = new URL(process.env.SALEOR_API_URL);
-
-    return await request<any, QueryVariables>(
-      url.toString(),
-      query,
-      variables,
-      requestHeaders,
     );
   }
 
