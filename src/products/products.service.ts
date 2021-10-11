@@ -129,7 +129,6 @@ export class ProductsService {
                     amount 
                   }
                 }
-              }
             }
             productErrors {
                 code 

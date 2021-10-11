@@ -8,6 +8,8 @@ import {
   Put,
   Query,
   Request,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { StockDto } from './dto/stock.dto';
@@ -34,6 +36,7 @@ export class ProductsController {
     return this.productsService.getOne(productId, token);
   }
 
+  @UsePipes(ValidationPipe)
   @Post()
   async create(
     @Body() createProductDto: CreateProductDto,
@@ -43,6 +46,7 @@ export class ProductsController {
     return await this.productsService.addOne(createProductDto, token);
   }
 
+  /* @UsePipes(ValidationPipe) */
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -65,6 +69,7 @@ export class ProductsController {
   /**
    * Create/add stock amount of a given product variant in a given wharehouse
    */
+  @UsePipes(ValidationPipe)
   @Post(':id/stocks')
   createStock(
     @Param('id') productId,
@@ -78,6 +83,7 @@ export class ProductsController {
   /**
    * Update stock amount of a given product variant in a given wharehouse
    */
+  @UsePipes(ValidationPipe)
   @Put(':id/stocks')
   updateStock(
     @Param('id') productId: string,
