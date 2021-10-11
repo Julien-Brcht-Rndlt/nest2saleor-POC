@@ -1,8 +1,8 @@
 export class Stock {
-  productId: string;
+  productId!: string;
   warehouseId?: string;
   warehouseName?: string;
-  quantity: number;
+  quantity!: number;
 
   constructor(productId: string) {
     this.productId = productId;

@@ -1,4 +1,4 @@
-import { Request } from '@nestjs/common';
+import { HttpException, Request } from '@nestjs/common';
 
 /**
  * Helper tool function that allows to apply auth x-access-token onto another final performed action
@@ -6,9 +6,9 @@ import { Request } from '@nestjs/common';
  * @param callback callback that calls the final performed action
  * @returns
  */
-export const applyXAccessToken = <T = any>(
+export const applyXAccessToken = <T>(
   request: Request,
-  callback: (t: string) => T,
+  callback: (t: string) => Promise<T | HttpException>,
 ) => {
   const token = request.headers['x-access-token'];
   return callback(token);

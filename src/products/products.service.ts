@@ -206,8 +206,7 @@ export class ProductsService {
     productId: string,
     updateProductDto: UpdateProductDto,
     token: string,
-  ): Promise<Product> | null {
-    let product: Product | null = null;
+  ): Promise<Product | HttpException> {
     const query = `mutation UPDATE_PARTIALLY_PRODUCT($productId: ID !, $updateValues: ProductInput !) {
         productUpdate(id: $productId, input: $updateValues)
         {
@@ -251,7 +250,7 @@ export class ProductsService {
       response.productUpdate.productErrors.length === 0
     ) {
       const { id, name, slug } = response.productUpdate.product;
-      product = new Product(id, name, slug);
+      const product = new Product(id, name, slug);
       response.productUpdate.product.variants?.forEach((variant) => {
         product.variants.push({
           name: variant.name,
@@ -261,7 +260,7 @@ export class ProductsService {
         });
       });
       return product;
-    } else if (response.productUpdate.productErrors.length > 0) {
+    } else {
       throw new HttpException(
         'Error while updating product: product was not modified',
         HttpStatus.BAD_REQUEST,

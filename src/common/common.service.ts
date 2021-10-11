@@ -26,7 +26,7 @@ export class CommonService {
       password: process.env.SALEOR_API_PASSWORD,
     };
 
-    const url = new URL(process.env.SALEOR_API_URL);
+    const url = new URL(process.env.SALEOR_API_URL || '');
 
     return await request(url.toString(), query, variables);
   }

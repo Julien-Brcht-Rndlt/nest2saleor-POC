@@ -15,7 +15,7 @@ export const performQuery = async <T = any>(
   const requestHeaders = {
     Authorization: token,
   };
-  const url = new URL(process.env.SALEOR_API_URL);
+  const url = new URL(process.env.SALEOR_API_URL || '');
 
   return await request<any, T>(
     url.toString(),

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   Param,
   Patch,
   Post,
@@ -32,7 +33,7 @@ export class ProductsController {
   @Get()
   find(@Query('limit') limit: number, @Request() req: Request) {
     const pLimit: number = limit && limit > 0 ? limit : 5;
-    return applyXAccessToken<Promise<Product[]>>(
+    return applyXAccessToken<Product[]>(
       req,
       (token: string): Promise<Product[]> => {
         return this.productsService.getSome(pLimit, token);
@@ -45,7 +46,7 @@ export class ProductsController {
    */
   @Get(':id')
   findOne(@Param('id') productId: string, @Request() req: Request) {
-    return applyXAccessToken<Promise<Product>>(
+    return applyXAccessToken<Product>(
       req,
       (token: string): Promise<Product> => {
         return this.productsService.getOne(productId, token);
@@ -62,7 +63,7 @@ export class ProductsController {
     @Body() createProductDto: CreateProductDto,
     @Request() req: Request,
   ) {
-    return applyXAccessToken<Promise<Product>>(
+    return applyXAccessToken<Product>(
       req,
       async (token: string): Promise<Product> => {
         return await this.productsService.addOne(createProductDto, token);
@@ -73,16 +74,22 @@ export class ProductsController {
   /**
    * Update partially a product based on its given id and a payload of the values that have to be modified.
    */
-  /* @UsePipes(ValidationPipe) */
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      forbidNonWhitelisted: true,
+      whitelist: true,
+    }),
+  )
   @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
     @Request() req: Request,
   ) {
-    return applyXAccessToken<Promise<Product>>(
+    return applyXAccessToken<Product>(
       req,
-      async (token: string): Promise<Product> => {
+      async (token: string): Promise<Product | HttpException> => {
         return this.productsService.modifyOne(id, updateProductDto, token);
       },
     );
@@ -93,7 +100,7 @@ export class ProductsController {
    */
   @Get(':id/stocks')
   readStock(@Param() params: { id: string }, @Request() req: Request) {
-    return applyXAccessToken<Promise<Stock>>(
+    return applyXAccessToken<Stock>(
       req,
       async (token: string): Promise<Stock> => {
         return this.stocksService.retrieveAmount(params.id, token);
@@ -111,7 +118,7 @@ export class ProductsController {
     @Body() stockDto: StockDto,
     @Request() req: Request,
   ) {
-    return applyXAccessToken<Promise<Stock>>(
+    return applyXAccessToken<Stock>(
       req,
       async (token: string): Promise<Stock> => {
         return this.stocksService.initAmount(productId, stockDto, token);
@@ -129,7 +136,7 @@ export class ProductsController {
     @Body() stockDto: StockDto,
     @Request() req: Request,
   ) {
-    return applyXAccessToken<Promise<Stock>>(
+    return applyXAccessToken<Stock>(
       req,
       async (token: string): Promise<Stock> => {
         return this.stocksService.modifyAmount(productId, stockDto, token);
