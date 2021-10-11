@@ -23,6 +23,9 @@ type QueryVariables = {
   quantity?: number;
 };
 
+/**
+ * Implements all stock services behaviours.
+ */
 @Injectable()
 export class StocksService {
   /**
@@ -172,6 +175,12 @@ export class StocksService {
     );
   }
 
+  /**
+   * Permits to extract a Stock representation from a product variant response data.
+   * @param productId id of the product
+   * @param productVariant product variant of the product
+   * @returns a Stock object
+   */
   private parseAsStock(productId, productVariant: ProductVariant): Stock {
     const stock: Stock = new Stock(productId);
     if (productVariant.stocks && productVariant.stocks.length > 0) {

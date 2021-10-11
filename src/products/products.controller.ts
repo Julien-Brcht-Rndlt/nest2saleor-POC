@@ -26,6 +26,9 @@ export class ProductsController {
     private readonly productsService: ProductsService,
     private readonly stocksService: StocksService,
   ) {}
+  /**
+   * Retrieve the first n products (n is lower or equal to limit value).
+   */
   @Get()
   find(@Query('limit') limit: number, @Request() req: Request) {
     const pLimit: number = limit && limit > 0 ? limit : 5;
@@ -37,6 +40,9 @@ export class ProductsController {
     );
   }
 
+  /**
+   * Retrieve a specific product given its unique id.
+   */
   @Get(':id')
   findOne(@Param('id') productId: string, @Request() req: Request) {
     return applyXAccessToken<Promise<Product>>(
@@ -47,6 +53,9 @@ export class ProductsController {
     );
   }
 
+  /**
+   * Create a new product based on a payload containing the required values.
+   */
   @UsePipes(ValidationPipe)
   @Post()
   async create(
@@ -61,6 +70,9 @@ export class ProductsController {
     );
   }
 
+  /**
+   * Update partially a product based on its given id and a payload of the values that have to be modified.
+   */
   /* @UsePipes(ValidationPipe) */
   @Patch(':id')
   update(

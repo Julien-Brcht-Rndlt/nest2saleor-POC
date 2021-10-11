@@ -27,8 +27,14 @@ type UpdateQueryVariables = {
   };
 };
 
+/**
+ * Implements all product services behaviours.
+ */
 @Injectable()
 export class ProductsService {
+  /**
+   * Get a specific product according to its product id.
+   */
   async getOne(productId: string, token: string): Promise<Product> {
     const query = `query GET_PRODUCT_BYID($productId : ID !) {
       product(id: $productId) {
@@ -194,7 +200,7 @@ export class ProductsService {
   }
 
   /**
-   * Update a product
+   * Update a product onto Saleor API, given its id and a payload.
    */
   async modifyOne(
     productId: string,

@@ -1,8 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import request from 'graphql-request';
 
+/**
+ * Implements all the app common services.
+ */
 @Injectable()
 export class CommonService {
+  /**
+   * Method that performs authentication against the Saleor API.
+   * @returns a Promise containing authentication response data.
+   */
   async authToSaleorAPI(): Promise<any> {
     const query = `mutation 
         GET_TOKEN($email: String! , $password: String!) {

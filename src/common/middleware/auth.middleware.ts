@@ -6,6 +6,10 @@ import {
 } from '@nestjs/common';
 import { CommonService } from '../common.service';
 
+/**
+ * Middleware that triggers authentication against Saleor API,
+ * and then sets up JWT auth token as an x-access-token header.
+ */
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
   constructor(private readonly commonService: CommonService) {}

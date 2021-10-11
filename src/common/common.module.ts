@@ -3,7 +3,7 @@ import { AuthMiddleware } from './middleware/auth.middleware';
 import { CommonService } from './common.service';
 
 @Module({
-  providers: [CommonService]
+  providers: [CommonService],
 })
 export class CommonModule implements NestModule {
   configure(consummer: MiddlewareConsumer) {
