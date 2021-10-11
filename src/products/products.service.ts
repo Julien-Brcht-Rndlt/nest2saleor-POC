@@ -1,9 +1,31 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Product } from './entities/product.entity';
-import { request } from 'graphql-request';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { URL } from 'url';
+import { performQuery } from 'src/utils/common-funcs';
+
+type QueryVariables = {
+  productId?: string;
+  limit?: number;
+};
+
+type CreateQueryVariables = {
+  productInput: {
+    name: string;
+    sku: string;
+    slug?: string;
+    basePrice?: number;
+  };
+};
+
+type UpdateQueryVariables = {
+  updateValues: {
+    name?: string;
+    sku?: string;
+    slug?: string;
+    basePrice?: number;
+  };
+};
 
 @Injectable()
 export class ProductsService {
@@ -27,19 +49,15 @@ export class ProductsService {
     const variables = {
       productId,
     };
-    const requestHeaders = {
-      Authorization: token,
-    };
 
-    const url = new URL(process.env.SALEOR_API_URL);
-
-    const response = await request(
-      url.toString(),
+    const response = await performQuery<QueryVariables>(
       query,
       variables,
-      requestHeaders,
+      token,
     );
+
     console.log(response.product.variants[0].price);
+
     const { id, name, slug } = response.product;
     const product = new Product(id, name, slug);
     response.product.variants?.forEach((variant) => {
@@ -87,13 +105,10 @@ export class ProductsService {
     };
     console.log('requestHeaders', requestHeaders);
 
-    const url = new URL(process.env.SALEOR_API_URL);
-
-    const response = await request(
-      url.toString(),
+    const response = await performQuery<QueryVariables>(
       query,
       variables,
-      requestHeaders,
+      token,
     );
 
     const products: Product[] = response?.products.edges.map((edge) => {
@@ -157,17 +172,10 @@ export class ProductsService {
       },
     };
 
-    const requestHeaders = {
-      Authorization: token,
-    };
-
-    const url = new URL(process.env.SALEOR_API_URL);
-
-    const response = await request(
-      url.toString(),
+    const response = await performQuery<CreateQueryVariables>(
       query,
       variables,
-      requestHeaders,
+      token,
     );
 
     const productDto: Omit<CreateProductDto, 'sku'> & { id: string } =
@@ -226,17 +234,10 @@ export class ProductsService {
       },
     };
 
-    const requestHeaders = {
-      authorization: token,
-    };
-
-    const url = new URL(process.env.SALEOR_API_URL);
-
-    const response = await request(
-      url.toString(),
+    const response = await performQuery<UpdateQueryVariables>(
       query,
       variables,
-      requestHeaders,
+      token,
     );
 
     if (
