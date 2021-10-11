@@ -5,16 +5,22 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   Request,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
+import { StockDto } from './dto/stock.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
+import { StocksService } from './stocks.service';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly stocksService: StocksService,
+  ) {}
   @Get()
   find(@Query('limit') limit: number, @Request() req: Request) {
     const token = req.headers['x-access-token'];
@@ -45,5 +51,40 @@ export class ProductsController {
   ) {
     const token = req.headers['x-access-token'];
     return this.productsService.modifyOne(id, updateProductDto, token);
+  }
+
+  /**
+   * Retrieve stock amount of a given product variant in a given wharehouse
+   */
+  @Get(':id/stocks')
+  readStock(@Param() params: { id: string }, @Request() req: Request) {
+    const token = req.headers['x-access-token'];
+    return this.stocksService.retrieveAmount(params.id, token);
+  }
+
+  /**
+   * Create/add stock amount of a given product variant in a given wharehouse
+   */
+  @Post(':id/stocks')
+  createStock(
+    @Param('id') productId,
+    @Body() stockDto: StockDto,
+    @Request() req: Request,
+  ) {
+    const token = req.headers['x-access-token'];
+    return this.stocksService.initAmount(productId, stockDto, token);
+  }
+
+  /**
+   * Update stock amount of a given product variant in a given wharehouse
+   */
+  @Put(':id/stocks')
+  updateStock(
+    @Param('id') productId: string,
+    @Body() stockDto: StockDto,
+    @Request() req: Request,
+  ) {
+    const token = req.headers['x-access-token'];
+    return this.stocksService.modifyAmount(productId, stockDto, token);
   }
 }
